@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipe List</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+
+    
+    <!-- Add custom CSS -->
+    <style>
+        body {
+            background-image: url('C:/Users/14372/Downloads/img.jpg'); /* Replace with the URL of your background image */
+            background-size: cover; /* Cover the entire page with the background image */
+            background-repeat: no-repeat; /* Prevent the background image from repeating */
+            background-attachment: fixed; /* Fix the background image in place */
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.7); /* Navbar background color with transparency */
+        }
+        .navbar-brand {
+            color: #fff; /* Navbar brand text color */
+        }
+        .recipe-box {
+            background-color: rgba(255, 255, 255, 0.8); /* Light gray background for each recipe with transparency */
+            padding: 20px;
+            border: 1px solid #ddd; /* Gray border for recipe boxes */
+            border-radius: 5px;
+            margin-bottom: 20px; /* Add space between recipe boxes */
+        }
+        h3 {
+            color: #007bff; /* Blue header for each recipe */
+        }
+        .go-back-link {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Recipe List</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Generated Recipes</h1>
+        <!-- Move the Go Back link outside of the recipe boxes -->
+        <div class="go-back-link">
+            <!-- Add the Go Back link to the home page above the recipe list -->
+            <a href="/" class="btn btn-primary">Go Back to Home Page</a>
+        </div>
+        {% for recipe in recipes %}
+        <div class="recipe-box">
+            <h3>Ingredients:</h3>
+            <p>{{ recipe.ingredients }}</p>
+            <h3>Generated Recipe:</h3>
+            <p>{{ recipe.recipe }}</p>
+       
+            <!-- ... display recipe info ... -->
+            <!-- Add a delete button for each recipe -->
+            <form action="{{ url_for('delete_recipe', recipe_id=recipe['_id']) }}" method="POST">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+<!-- ... rest of your HTML ... -->
+
+        {% endfor %}
+    </div>
+
+    <!-- Include Bootstrap JavaScript (Optional, for some features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
