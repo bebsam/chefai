@@ -9,41 +9,46 @@
     
     <style>
         body {
-        background-color: #fdfd96; 
-        font-family: 'Comic Neue', cursive; 
-        position: relative;
-        margin: 0;
-        height: 100vh; 
-        overflow: hidden; 
-    }
-    
-    body::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background-image: url('https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHZlZ2V0YWJsZXxlbnwwfHwwfHx8MA%3D%3D');
-        background-repeat: no-repeat;
-        background-size: cover;
-        opacity: 0.5; 
-        z-index: -1; 
-    }
+            background-color: #fdfd96; 
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+            margin: 0;
+            height: 100vh; 
+            overflow: hidden; 
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: url('https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHZlZ2V0YWJsZXxlbnwwfHwwfHx8MA%3D%3D');
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 0.5; 
+            z-index: -1; 
+        }
+        
         a:hover {
             color: #ffa07a; 
         }
+        
         .navbar-brand, .nav-link {
             color: #ff4500 !important; 
         }
+        
         .navbar-brand:hover, .nav-link:hover {
             color: #ffa70a !important; 
         }
+        
         .welcome-message {
             color:black ;
             text-align: center;
             margin: 40px 0;
         }
+        
         .joke {
             background-color: rgba(0,0,0,0.6); /* light blue */
             border-radius: 15px;
@@ -65,7 +70,10 @@
                         <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-link active" aria-current="page" href="{{ url_for('recipe_board') }}">Recipe Board</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="document.getElementById('loginModal').style.display='block'">Login</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('register') }}">Signup</a>
@@ -78,24 +86,67 @@
         </div>
     </nav>
 
-    <div class="container" >
-        <h1 class="welcome-message">Welcome to CHEF AI!</h1>
-        <p class="text-center">Get ready to spice up your cooking with our personalized recipe suggestions. Just enter your ingredients, and let us do the magic!</p>
-        
-        <div class="joke text-center" style="color: white;">
-            <p>Why did the tomato turn red? Because it saw the salad dressing!</p>
+    <div class="container my-5">
+        <h2 class="text-center my-4">Why Choose CHEF AI?</h2>
+    
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-utensils fa-3x"></i>
+                <h4>Personalized Recipes</h4>
+                <p>Get recipes tailored to your ingredients and preferences.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-user-friends fa-3x"></i>
+                <h4>Community Driven</h4>
+                <p>Share and discover recipes from a community of food enthusiasts.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-seedling fa-3x"></i>
+                <h4>Health & Nutrition</h4>
+                <p>Find healthy options and nutritional information for your meals.</p>
+            </div>
         </div>
-        
-        <div class="joke text-center" style="color: white;">
-            <p>What do you call cheese that isn't yours? Nacho cheese!</p>
+    </div>
+
+    <!-- Modal Login Form -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content animate">
+            <span onclick="document.getElementById('loginModal').style.display='none'" class="close" title="Close Modal">&times;</span>
+            <div class="imgcontainer">
+                <img src="img_avatar2.png" alt="Avatar" class="avatar">
+            </div>
+            <div class="container">
+                <label for="uname"><b>Username</b></label>
+                <input type="text" placeholder="Enter Username" name="uname" required>
+
+                <label for="psw"><b>Password</b></label>
+                <input type="password" placeholder="Enter Password" name="psw" required>
+                
+                <button type="submit">Login</button>
+                <label>
+                    <input type="checkbox" checked="checked" name="remember"> Remember me
+                </label>
+            </div>
+            <div class="container" style="background-color:#f1f1f1">
+                <button type="button" onclick="document.getElementById('loginModal').style.display='none'" class="cancelbtn">Cancel</button>
+                <span class="psw">Forgot <a href="#">password?</a></span>
+            </div>
         </div>
-        <div style="text-align: center;">
-            <img src="https://png.pngtree.com/png-clipart/20230824/original/pngtree-cute-little-boy-chef-holding-a-silver-tray-picture-image_8428295.png" alt="Little boy chef holding a silver tray" style="width: 300px; height: 300px">
-        </div>
-        
     </div>
 
     <!-- Include Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Get the modal
+        var modal = document.getElementById('loginModal');
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

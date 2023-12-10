@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Board</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <style>
+        body, html {
+            /* background-color: #fdfd96;  */
+            background-color: #DC3535;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),url('https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHZlZ2V0YWJsZXxlbnwwfHwwfHx8MA%3D%3D');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 500px;
+            width: 90%;
+            margin: 30px auto;
+        }
+        .navbar-brand, .nav-link {
+            color: #ff4500 !important; 
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: #ffa07a !important; 
+        }
+        .recipe-box {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 250%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        h1, h3 {
+            color: black;
+        }
+        .navbar {
+            background-color: #fff; 
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand,
+        .nav-link {
+            color: #2e8b57; 
+        }
+        .nav-link:hover {
+            color: #ffa07a; 
+        }
+
+        .container {
+            max-width: 85%; /* Set the maximum width of the container */
+            margin: 30px auto;
+        }
+
+        .card {
+            margin-bottom: 20px; /* Space between cards */
+            
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 200px; /* Fixed height for image */
+            object-fit: cover;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%; /* Adjust width as needed */
+        }
+
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .star-rating .fas, .star-rating .far, .star-rating .fa-star-half-alt {
+            font-size: 1.5em; /* Increase the size */
+            margin-right: 0px; /* Adjust the spacing between stars */
+            /* Gradient effect */
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-image: linear-gradient(to right, #FFD700, #FF6347); /* Example gradient from gold to tomato */
+        }
+        /* Custom styles for sidebar */
+        .w3-sidebar {
+            height: 100%;
+            width: 25%;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #f1f1f1;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .w3-sidebar .w3-bar-item {
+        display: block; /* Ensure links are displayed as block (for vertical alignment) */
+        color: black; /* Set your preferred color */
+        text-decoration: none; /* Remove underline from links */
+    }
+
+    .w3-sidebar .w3-bar-item:hover {
+        color: grey; /* Color for hover state */
+        background-color: #f8f8f8; /* Optional: background color for hover state */
+    }
+        .w3-main {
+            margin-left: 25%;
+            padding: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
+        <button class="w3-bar-item w3-button w3-large" onclick="w3_close()">&times;</button>
+        <span class="w3-bar-item w3-button"><b>Welcome, {{ session['user'] }}</b></span>
+        <a href="{{ url_for('land') }}" class="w3-bar-item w3-button">Home</a>
+        {% if 'user' in session %}
+            <a href="{{ url_for('recipe_list') }}" class="w3-bar-item w3-button">Recipe List</a>
+            <a href="{{ url_for('index') }}" class="w3-bar-item w3-button">Generate a new recipe</a>
+            <a href="{{ url_for('recipe_board') }}" class="w3-bar-item w3-button">Recipe Board</a>
+            <a href="{{ url_for('logout') }}" class="w3-bar-item w3-button">Logout</a>
+            
+        {% else %}
+            <a href="{{ url_for('login') }}" class="w3-bar-item w3-button">Login</a>
+            <a href="{{ url_for('register') }}" class="w3-bar-item w3-button">Signup</a>
+            <a href="{{ url_for('recipe_board') }}" class="w3-bar-item w3-button">Recipe Board</a>
+            <a href="{{ url_for('login_as_guest') }}" class="w3-bar-item w3-button">Login as Guest</a>
+        {% endif %}
+    </div>
+    
+    <div id="main">
+        <button id="openNav" class="w3-button w3-xlarge" onclick="w3_open()">&#9776; </button>
+
+    <div class="container mt-4">
+        <h1 class="mb-4 text-center">Recipe Board</h1>
+        <div class="row">
+            {% for recipe in recipes %}
+            <div class="col-md-4">
+                <div class="card recipe-card">
+                    <!-- Display image or a default image if none exists -->
+                    <img src="{{ recipe.image_url or 'path/to/default-image.jpg' }}" class="card-img-top" alt="Recipe Image">
+                    <div class="card-body">
+                        
+                        <p class="card-text"><strong>Submitted by:</strong> {{ recipe.username }}</p>
+                        <p class="card-text">{{ recipe.ingredients }}</p>
+                        
+                        <div>
+                            <div class="star-rating">
+                                {% set avg_rating = recipe.ratings|calculate_average_rating %}
+                                {% for i in range((avg_rating|round(0, 'floor'))|int) %}
+                                    <i class="fas fa-star"></i> <!-- Filled star -->
+                                {% endfor %}
+                                {% if avg_rating % 1 >= 0.5 %}
+                                    <i class="fas fa-star-half-alt"></i> <!-- Half star -->
+                                {% endif %}
+                                {% for i in range((5 - avg_rating|round(0, 'ceil'))|int) %}
+                                    <i class="far fa-star"></i> <!-- Empty star -->
+                                {% endfor %}
+                                <a href="#" onclick="openRatingsModal('ratingsModal{{ recipe._id }}'); return false;">
+                                    <span class="ratings-count">({{ recipe.ratings|length }})</span>
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-primary" onclick="openModal('modal{{ recipe._id }}')">Show Details</button>
+                        <button type="button" class="btn btn-secondary ml-auto" onclick="openRatingsModal('ratingsModal{{ recipe._id }}')">View Ratings</button>
+                    </div>
+                </div>
+    
+                <!-- The Modal -->
+                <div id="modal{{ recipe._id }}" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('modal{{ recipe._id }}')">&times;</span>
+                        
+                        <p><strong>Recipe:</strong> {{ recipe.recipe }}</p>
+                        <p><strong>Ingredients:</strong> {{ recipe.ingredients }}</p>
+                
+                        <!-- Ratings and comments form -->
+                        <form method="POST" action="/rate_recipe/{{ recipe._id }}">
+                            <div class="mb-3">
+                                <label for="rating-{{ recipe._id }}">Rate this recipe (1-5):</label>
+                                <input type="number" name="rating" id="rating-{{ recipe._id }}" class="form-control" min="1" max="5" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment-{{ recipe._id }}">Comment:</label>
+                                <textarea name="comment" id="comment-{{ recipe._id }}" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Rating</button>
+                        </form>
+                
+                        
+                    </div>
+                </div>
+                <div id="ratingsModal{{ recipe._id }}" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal('ratingsModal{{ recipe._id }}')">&times;</span>
+                        <div id="ratingsContent-{{ recipe._id }}">
+                            <!-- Display existing ratings and comments -->
+                        <div class="ratings-comments">
+                            {% if recipe.ratings %}
+                                <h4>Ratings and Comments:</h4>
+                                {% for rating in recipe.ratings %}
+                                    <p>User: {{ rating.user }} - Rating: {{ rating.rating }}</p>
+                                    <p>Comment: {{ rating.comment }}</p>
+                                {% endfor %}
+                            {% else %}
+                                <p>No ratings or comments yet.</p>
+                            {% endif %}
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <p>No recipes have been submitted to the board yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+    
+    
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function openModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = "block";
+        }
+    
+        function closeModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = "none";
+        }
+    
+        window.onclick = function(event) {
+            var modals = document.getElementsByClassName('modal');
+            for (var i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = "none";
+                }
+            }
+        }
+    
+        function openRatingsModal(recipeId) {
+            fetch('/get_ratings/' + recipeId)
+                .then(response => response.json())
+                .then(data => {
+                    let content = '';
+                    data.forEach(rating => {
+                        content += '<p>User: ' + rating.user + ', Rating: ' + rating.rating + ', Comment: ' + rating.comment + '</p>';
+                    });
+                    document.getElementById('ratingsContent-' + recipeId).innerHTML = content;
+                    document.getElementById('ratingsModal-' + recipeId).style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        function openRatingsModal(modalId) {
+        // Logic to fetch and display ratings and comments
+        var modal = document.getElementById(modalId);
+        modal.style.display = "block";
+    }
+        function calculate_average_rating(ratings) {
+            if (!ratings || ratings.length === 0) return 0;
+            let total = 0;
+            for (let rating of ratings) {
+                total += rating;
+            }
+            return total / ratings.length;
+        }
+    function w3_open() {
+    document.getElementById("main").style.marginLeft = "25%";
+    document.getElementById("mySidebar").style.width = "25%";
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("openNav").style.display = 'none';
+}
+function w3_close() {
+    document.getElementById("main").style.marginLeft = "0%";
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("openNav").style.display = "inline-block";
+}
+    </script>
+    </script>
+</body>
+</html>

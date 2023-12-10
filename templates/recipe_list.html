@@ -5,16 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe List</title>
 
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-        background-color: #fdfd96; 
-        font-family: 'Comic Neue', cursive; 
-        position: relative;
-        margin: 0;
-        height: 100vh; 
-        overflow: visible; 
-    }    
+    body, html {
+    background-color: #fdfd96; 
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),url('https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&q=80&w=1000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHZlZ2V0YWJsZXxlbnwwfHwwfHx8MA%3D%3D');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    overflow-x: hidden; /* Prevents horizontal scroll */
+    }
+    
     body::before {
         content: "";
         position: absolute;
@@ -78,58 +84,277 @@
         .nav-link:hover {
             color: #ffa07a; 
         }
+        .sticky-note {
+        padding: 10px;
+        background-color: #fffdd0; /* Sticky note yellow */
+        margin-top: 20px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .sticky-note-text {
+            border: none;
+            background: transparent;
+            resize: none; /* Prevent user from resizing the textarea */
+        }
+
+        .container {
+            max-width: 85%; /* Set the maximum width of the container */
+            margin: 30px auto;
+        }
+
+        .card {
+            height: 100%; /* Make all cards of equal height */
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 100px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 35px;
+            border: 1px solid #888;
+            width: 40%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .custom-margin {
+            margin-right: 10px; /* Adjust the margin as needed */
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Custom styles for sidebar */
+        .w3-sidebar {
+            height: 100%;
+            width: 25%;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #f1f1f1;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .w3-sidebar .w3-bar-item {
+        display: block; /* Ensure links are displayed as block (for vertical alignment) */
+        color: black; /* Set your preferred color */
+        text-decoration: none; /* Remove underline from links */
+    }
+
+    .w3-sidebar .w3-bar-item:hover {
+        color: grey; /* Color for hover state */
+        background-color: #f8f8f8; /* Optional: background color for hover state */
+    }
+        .w3-main {
+            margin-left: 25%;
+            padding: 20px;
+        }
+
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">CHEF AI</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav ms-auto">
-                    {% if session.user %}
-                    
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">Generate a new recipe</a>
-                    </li>
-                    <li class="nav-item">
-                        <form action="{{ url_for('logout') }}" method="post">
-                            <button type="submit" class="nav-link btn btn-link">Logout</button>
-                        </form>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/register">Register</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">
+        <button class="w3-bar-item w3-button w3-large" onclick="w3_close()">&times;</button>
+        <span class="w3-bar-item w3-button"><b>Welcome, {{ session['user'] }}</b></span>
+        <a href="{{ url_for('land') }}" class="w3-bar-item w3-button">Home</a>
+        {% if 'user' in session %}
+            <a href="{{ url_for('recipe_list') }}" class="w3-bar-item w3-button">Recipe List</a>
+            <a href="{{ url_for('index') }}" class="w3-bar-item w3-button">Generate a new recipe</a>
+            <a href="{{ url_for('recipe_board') }}" class="w3-bar-item w3-button">Recipe Board</a>
+            <a href="{{ url_for('logout') }}" class="w3-bar-item w3-button">Logout</a>
+            
+        {% else %}
+            <a href="{{ url_for('login') }}" class="w3-bar-item w3-button">Login</a>
+            <a href="{{ url_for('register') }}" class="w3-bar-item w3-button">Signup</a>
+            <a href="{{ url_for('login_as_guest') }}" class="w3-bar-item w3-button">Login as Guest</a>
+        {% endif %}
+    </div>
+    
 
+<div id="main">
+    <button id="openNav" class="w3-button w3-xlarge" onclick="w3_open()">&#9776; </button>
     <div class="container mt-4">
         <h1 class="mb-4 text-center">Generated Recipes</h1>
-        
-        {% for recipe in recipes %}
-        <div class="recipe-box" style="float: center;">
-            <h5 style="color: #2e8b57;">Ingredients:</h5>
-            <p>{{ recipe.ingredients }}</p>
-            <h5 style="color: #2e8b57;">Generated Recipe:</h5>
-            <p>{{ recipe.recipe }}</p>
-            <form action="{{ url_for('delete_recipe', recipe_id=recipe['_id']) }}" method="POST">
-                <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
+        <div class="row">
+            {% for recipe in recipes %}
+            <div class="col-lg-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Ingredients</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ recipe.ingredients }}</p>
+                        <div class="btn-group">
+                            <button class="btn btn-primary custom-margin" onclick="openModal('modal{{ recipe['_id'] }}')">Show Details</button>
+                            <form action="{{ url_for('delete_recipe', recipe_id=recipe['_id']) }}" method="post">
+                                <button type="submit" class="btn btn-danger">Delete Recipe</button>
+                            </form>
+                        </div>
+                        
+                    </div>
+                    <!-- The Modal -->
+    <div id="modal{{ recipe['_id'] }}" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+        <span class="close" onclick="closeModal('modal{{ recipe['_id'] }}')">&times;</span>
+        <h5 class="card-title">Generated Recipe</h5>
+        <p>{{ recipe.recipe }}</p>
+
+        <!-- User notes section -->
+        <div class="sticky-note">
+            <textarea class="form-control sticky-note-text" id="note_{{ recipe['_id'] }}" rows="3">{{ recipe.user_notes }}</textarea>
+            <br>
+            <button onclick="saveNote('{{ recipe['_id'] }}')" class="btn btn-info">Save Note</button>
+            <button onclick="deleteNote('{{ recipe['_id'] }}')" class="btn btn-danger">Delete Note</button>
         </div>
-        {% endfor %}
+
+        <br>
+
+        <!-- Image upload form -->
+        <form action="{{ url_for('upload_image', recipe_id=recipe['_id']) }}" method="post" enctype="multipart/form-data">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" id="recipe_image" name="recipe_image" accept="image/*" capture="camera">
+                <button type="submit" class="btn btn-primary">Upload Image</button>
+            </div>
+        </form>
+
+        <!-- Display uploaded image -->
+        {% if recipe.image_url %}
+        <div>
+            <img src="{{ recipe.image_url }}" alt="Uploaded Image" style="width: 100%; height: auto;">
+        </div>
+        {% endif %}
+
+        <br>
+        <!-- Form to submit the recipe to the board -->
+<form action="{{ url_for('submit_to_board', recipe_id=recipe['_id']) }}" method="post">
+    <!-- Conditionally render the button based on the recipe's on_board status -->
+    {% if recipe.on_board %}
+        <button type="submit" class="btn btn-success" disabled>Submitted to Recipe Board</button>
+    {% else %}
+        <button type="submit" class="btn btn-success">Submit to Recipe Board</button>
+    {% endif %}
+</form>        
+        
+    </div> 
+</div>
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+</div>
     <!-- Include Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Add this script before the closing </body> tag -->
+<script>
+ 
+// Function to save a note
+function saveNote(recipeId) {
+    var noteContent = document.getElementById('note_' + recipeId).value;
+    fetch('/save_note/' + recipeId, {
+        method: 'POST',
+        body: JSON.stringify({ content: noteContent }),
+        headers: {
+            'Content-Type': 'application/json',
+            // Add other headers here, like CSRF tokens if needed
+        }
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              alert('Note saved successfully!');
+          } else {
+              alert('Error saving note.');
+          }
+      })
+      .catch((error) => {
+          console.error('Error:', error);
+      });
+}
+
+// Function to delete a note
+function deleteNote(recipeId) {
+    fetch('/delete_note/' + recipeId, {
+        method: 'POST',
+        headers: {
+            // Add headers here, like CSRF tokens if needed
+        }
+    }).then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // Remove the note from the DOM or handle as needed
+              alert('Note deleted successfully!');
+              document.getElementById('note_' + recipeId).value = ''; // Clear the note
+          } else {
+              alert('Error deleting note.');
+          }
+      })
+      .catch((error) => {
+          console.error('Error:', error);
+      });
+}
+
+// Function to open a modal
+function openModal(modalId) {
+            var modal = document.getElementById(modalId);
+            modal.style.display = "block";
+        }
+
+// Function to close a modal
+function closeModal(modalId) {
+    var modal = document.getElementById(modalId);
+    modal.style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    var modals = document.getElementsByClassName('modal');
+    for (var i = 0; i < modals.length; i++) {
+        if (event.target == modals[i]) {
+            modals[i].style.display = "none";
+        }
+    }
+}
+function w3_open() {
+    document.getElementById("main").style.marginLeft = "25%";
+    document.getElementById("mySidebar").style.width = "25%";
+    document.getElementById("mySidebar").style.display = "block";
+    document.getElementById("openNav").style.display = 'none';
+}
+function w3_close() {
+    document.getElementById("main").style.marginLeft = "0%";
+    document.getElementById("mySidebar").style.display = "none";
+    document.getElementById("openNav").style.display = "inline-block";
+}
+
+</script>
 </body>
 </html>
